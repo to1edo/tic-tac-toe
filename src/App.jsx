@@ -5,6 +5,7 @@ import audioEndFile from './assets/JitterGameSel.mp3'
 import Volume from "./components/Volume"
 import Turn from "./components/Turn"
 import SelectGame from "./components/SelectGame"
+import positions from './data'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
   const [marca, setMarca] = useState('X')
   const [final, setFinal] = useState(false)
   const [sound, setSound] = useState(true)
+  const [winnerPos, setWinnerPos] = useState('')
 
   const [audioClick, setAudioClick] = useState(new Audio(audioClickFile))
   const audioClickRef = useRef(audioClick)
@@ -98,6 +100,12 @@ function App() {
       setFinal(true)  
       audioEndRef.current.volume = sound
       audioEndRef.current.play()
+
+      Array.from(count).flat().forEach((item,index,array)=>{
+        if( item === 3){
+          setWinnerPos(array[--index].replace('X','').replace('O',''))
+        }
+      })
     }
 
   }
@@ -128,7 +136,13 @@ function App() {
           }
 
           
-          <Matriz matriz={matriz} updateMatriz={updateMatriz} final={final} />
+          <Matriz 
+            matriz={matriz} 
+            updateMatriz={updateMatriz} 
+            final={final} 
+            winnerPos={winnerPos} 
+            positions={positions}
+          />
 
           {
             final && (

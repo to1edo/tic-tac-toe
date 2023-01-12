@@ -1,4 +1,4 @@
-const Matriz = ({ matriz, updateMatriz, final}) => {
+const Matriz = ({ matriz, updateMatriz, final,winnerPos,positions}) => {
 
 
   return (
@@ -7,7 +7,7 @@ const Matriz = ({ matriz, updateMatriz, final}) => {
           fila.map((celda,j) => (
             <div 
                 key={[i,j]} 
-                className={`rounded-xl border border-black h-16 flex items-center justify-center text-6xl font-black ${ celda.trim()?'cursor-default':'cursor-pointer'} ${celda === 'X' ? 'text-[#ec1652]' : 'text-[#ffcc39]'} bg-[#101032]`}
+                className={`rounded-xl border border-black h-16 flex items-center justify-center text-6xl font-black ${ celda.trim()?'cursor-default':'cursor-pointer'} ${celda === 'X' ? 'text-[#ec1652]' : 'text-[#ffcc39]'} ${final && positions[i][j].includes(winnerPos)? 'shadow-[0_0px_10px_2px_#fff] border-white' : ''} bg-[#101032]`}
                 onClick={()=>{ !celda && !final ? updateMatriz(i,j) : '' }}
             >
               { celda }
