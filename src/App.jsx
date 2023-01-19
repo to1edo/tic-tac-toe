@@ -17,17 +17,17 @@ function App() {
   )
   const [marca, setMarca] = useState('X')
   const [final, setFinal] = useState(false)
-  const [sound, setSound] = useState(true)
+  const [sound, setSound] = useState(false)
   const [winnerPos, setWinnerPos] = useState('')
+  const [turn, setTurn] = useState(0)
+  const [gameMode, setGameMode] =useState(0)
 
-  const [audioClick, setAudioClick] = useState(new Audio(audioClickFile))
-  const audioClickRef = useRef(audioClick)
-  const [audioEnd, setAudioEnd] = useState(new Audio(audioEndFile))
-  const audioEndRef = useRef(audioEnd)
+  const audioClickRef = useRef(new Audio(audioClickFile))
+  const audioEndRef = useRef(new Audio(audioEndFile))
 
   const updateMatriz = (i,j)=>{
     audioClickRef.current.currentTime = 0
-    audioClickRef.current.pause()
+    // audioClickRef.current.pause()
     audioClickRef.current.volume = sound
 
     const temporal = [...matriz];
@@ -44,7 +44,11 @@ function App() {
   useEffect(() => {
     checkWinner()
   }, [matriz])
-  
+
+  useEffect(()=>{
+    resetGame()
+  },[gameMode])
+
 
   const checkWinner = ()=>{
     const count  = new Map()
@@ -95,9 +99,9 @@ function App() {
     }
 
     const result = Array.from(count).flat().filter( item => typeof(item) === 'number')
-    
+
     if(result.includes(3) || !matriz.flat().includes('')){
-      setFinal(true)  
+      setFinal(true)
 
       Array.from(count).flat().forEach((item,index,array)=>{
         if( item === 3){
@@ -107,50 +111,79 @@ function App() {
           audioEndRef.current.play()
         }
       })
+    }else{
+      if(!final && gameMode === 1){
+        pcPlay()
+      }
     }
-
+    
+    setTurn(0)
   }
 
 
   const resetGame = ()=>{
-      
+
     setFinal(false)
-    setMatriz([ 
+    setMatriz([
       ['','',''],
       ['','',''],
       ['','','']
     ])
     setWinnerPos('')
+    setMarca('X')
+  }
+
+  const pcPlay = ()=>{
+    const celdasVacias = []
+
+    matriz.forEach( (fila,i) =>{
+      fila.forEach( (celda,j) =>{
+        if(!celda){
+          celdasVacias.push([i,j])
+        }
+      })
+    })
+    
+    if(turn && celdasVacias.length){
+      const [i,j] = celdasVacias[ parseInt( Math.random()*(celdasVacias.length-1) ) ]
+      // console.log(i,j)
+
+      setTimeout(() => {
+        updateMatriz(i,j)
+      }, 400);
+
+    }
   }
 
   return (
     <>
       <div className="grid w-full max-w-md mx-auto px-10">
-        
+
           <div className="flex items-center">
             <Volume sound={sound} setSound={setSound}/>
-            <SelectGame/>
+            <SelectGame gameMode={gameMode} setGameMode={setGameMode}/>
           </div>
-          
+
           <h1 className='text-[#ffcc39] font-black text-4xl text-center mt-20 sm:mt-12'>Tic <span className="text-[#ec1652]">Tac</span> Toe</h1>
           {
             final || <Turn marca={marca}/>
           }
 
-          
-          <Matriz 
-            matriz={matriz} 
-            updateMatriz={updateMatriz} 
-            final={final} 
-            winnerPos={winnerPos} 
+
+          <Matriz
+            matriz={matriz}
+            updateMatriz={updateMatriz}
+            final={final}
+            winnerPos={winnerPos}
             positions={positions}
+            setTurn={setTurn}
           />
 
           {
             final && (
               <>
                 <p className="font-black text-center mt-12 text-white text-2xl">El juego ha terminado</p>
-                <button 
+                <button
                   className="p-2 bg-[#664ac5] font-bold text-white rounded-xl mt-8"
                   onClick={()=> resetGame()}
                 >
@@ -161,8 +194,7 @@ function App() {
           }
       </div>
     </>
-    
-  )   
+  )
 }
 
 export default App

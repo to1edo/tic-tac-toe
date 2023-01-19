@@ -1,4 +1,4 @@
-const Matriz = ({ matriz, updateMatriz, final,winnerPos,positions}) => {
+const Matriz = ({ matriz, updateMatriz, final,winnerPos,positions,setTurn}) => {
 
 
   return (
@@ -8,7 +8,7 @@ const Matriz = ({ matriz, updateMatriz, final,winnerPos,positions}) => {
             <div 
                 key={[i,j]} 
                 className={`rounded-xl border border-black h-16 flex items-center justify-center text-6xl font-black ${ celda.trim()?'cursor-default':'cursor-pointer'} ${celda === 'X' ? 'text-[#ec1652]' : 'text-[#ffcc39]'} ${final && positions[i][j].includes(winnerPos)? 'shadow-[0_0px_10px_2px_#fff] border-white' : ''} bg-[#101032]`}
-                onClick={()=>{ !celda && !final ? updateMatriz(i,j) : '' }}
+                onClick={()=>{ if(!celda && !final){updateMatriz(i,j); setTurn(1);}}}
             >
               { celda }
             </div>
