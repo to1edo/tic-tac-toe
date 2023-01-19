@@ -98,12 +98,13 @@ function App() {
     
     if(result.includes(3) || !matriz.flat().includes('')){
       setFinal(true)  
-      audioEndRef.current.volume = sound
-      audioEndRef.current.play()
 
       Array.from(count).flat().forEach((item,index,array)=>{
         if( item === 3){
           setWinnerPos(array[--index].replace('X','').replace('O',''))
+
+          audioEndRef.current.volume = sound
+          audioEndRef.current.play()
         }
       })
     }
@@ -119,6 +120,7 @@ function App() {
       ['','',''],
       ['','','']
     ])
+    setWinnerPos('')
   }
 
   return (
