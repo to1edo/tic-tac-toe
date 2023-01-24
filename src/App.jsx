@@ -50,6 +50,17 @@ function App() {
     resetGame()
   },[gameMode])
 
+  useEffect(()=>{
+    if(attempts.length){
+      attempts.forEach((item,index,array)=>{
+        if( item === 3){
+          setWinnerPos(array[--index].replace('X','').replace('O',''))
+          console.log(array[index].replace('X',''))
+        }
+      })
+    }
+  },[attempts])
+
   const anyoneWon = (matriz)=>{
     const count  = new Map()
 
@@ -110,12 +121,6 @@ function App() {
     if(result || !matriz.flat().includes('')){
 
       setFinal(true)
-      attempts.flat().forEach((item,index,array)=>{
-        if( item === 3){
-          setWinnerPos(array[--index].replace('X','').replace('O',''))
-          console.log(array[--index])
-        }
-      })
       
       if(result){
         audioEndRef.current.volume = sound
