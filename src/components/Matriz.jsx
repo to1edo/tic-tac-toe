@@ -2,7 +2,7 @@ const Matriz = ({ matriz, updateMatriz, final,winnerPos,positions,setTurn}) => {
 
 
   return (
-    <div className={`grid grid-cols-3 w-full bg-[#664ac5] gap-2 p-2 rounded-xl ${final? 'mt-28 sm:mt-36':'mt-8'}`}>
+    <div className={`grid grid-cols-3 w-full bg-[#664ac5] gap-2 p-2 rounded-xl ${final? 'mt-[120px] ':'mt-8'}`}>
       { matriz.map((fila,i) =>
           fila.map((celda,j) => (
             <div 

@@ -19,6 +19,7 @@ function App() {
   const [final, setFinal] = useState(false)
   const [sound, setSound] = useState(false)
   const [winnerPos, setWinnerPos] = useState('')
+  const [attempts, setAttempts] = useState([])
   const [turn, setTurn] = useState(0)
   const [gameMode, setGameMode] =useState(0)
 
@@ -49,8 +50,7 @@ function App() {
     resetGame()
   },[gameMode])
 
-
-  const checkWinner = ()=>{
+  const anyoneWon = (matriz)=>{
     const count  = new Map()
 
     //diagonal 1
@@ -97,22 +97,33 @@ function App() {
 
       }
     }
+    setAttempts(Array.from(count).flat())
+    const result =  Array.from(count).flat().filter( item => typeof(item) === 'number').includes(3)
+    return result
 
-    const result = Array.from(count).flat().filter( item => typeof(item) === 'number')
+  }
 
-    if(result.includes(3) || !matriz.flat().includes('')){
+  const checkWinner = ()=>{
+    
+    const result = anyoneWon(matriz)
+
+    if(result || !matriz.flat().includes('')){
+
       setFinal(true)
-
-      Array.from(count).flat().forEach((item,index,array)=>{
+      attempts.flat().forEach((item,index,array)=>{
         if( item === 3){
           setWinnerPos(array[--index].replace('X','').replace('O',''))
-
-          audioEndRef.current.volume = sound
-          audioEndRef.current.play()
+          console.log(array[--index])
         }
       })
+      
+      if(result){
+        audioEndRef.current.volume = sound
+        audioEndRef.current.play()
+      }
+
     }else{
-      if(!final && gameMode === 1){
+      if(!final && gameMode === 1 && turn === 1){
         pcPlay()
       }
     }
@@ -134,24 +145,105 @@ function App() {
   }
 
   const pcPlay = ()=>{
-    const celdasVacias = []
-
-    matriz.forEach( (fila,i) =>{
-      fila.forEach( (celda,j) =>{
-        if(!celda){
-          celdasVacias.push([i,j])
-        }
-      })
-    })
     
-    if(turn && celdasVacias.length){
-      const [i,j] = celdasVacias[ parseInt( Math.random()*(celdasVacias.length-1) ) ]
-      // console.log(i,j)
+    const temporal = [...matriz];
+    let jugadas
+    // temporal[i] = [...temporal[i]];
+    // temporal[i][j] = marca;
 
-      setTimeout(() => {
-        updateMatriz(i,j)
-      }, 400);
+    //jugar a ganar (mas de 2 jugadas hechas)
+    jugadas = 0
+    for (let i = 0 ; i <= 2 ; i++) {
+      for (let j = 0 ; j <=2 ; j++) {
+        if(temporal[i][j] === 'O'){
+          jugadas++
+        }
+      }
+    }
 
+    let attemptOne = 0
+    if(jugadas >= 2){
+
+      for (let i = 0 ; i <= 2 ; i++) {
+        for (let j = 0 ; j <=2 ; j++) {
+          if(temporal[i][j] === ''){
+            temporal[i] = [...temporal[i]]
+            temporal[i][j] = 'O'
+            const result = anyoneWon(temporal)
+            if(result){
+              attemptOne = 1
+              console.log('Win',[i,j],marca)
+              
+              setTimeout(() => {
+                updateMatriz(i,j)
+              }, 400);
+              
+            }
+            temporal[i][j] = ''
+          }
+        }
+      }
+
+    }
+
+    //evitar victoria del contrario (mas de 2 jugadas contrarias hechas)
+    let attemptTwo = 0
+    if(!attemptOne){
+
+      jugadas=0
+      for (let i = 0 ; i <= 2 ; i++) {
+        for (let j = 0 ; j <=2 ; j++) {
+          if(temporal[i][j] === 'X'){
+            jugadas++
+          }
+        }
+      }
+
+      if(jugadas >= 2){
+  
+        for (let i = 0 ; i <= 2 ; i++) {
+          for (let j = 0 ; j <=2 ; j++) {
+            if(temporal[i][j] === ''){
+              temporal[i] = [...temporal[i]]
+              temporal[i][j] = 'X'
+              const result = anyoneWon(temporal)
+              if(result){
+                attemptTwo = 1
+                console.log('Win',[i,j],'X')
+                
+                setTimeout(() => {
+                  updateMatriz(i,j)
+                }, 400);
+              }
+              temporal[i][j] = ''
+            }
+          }
+        }
+      }
+
+    }
+
+    //jugada random
+    if(!attemptOne && !attemptTwo){
+        const celdasVacias = []
+    
+        matriz.forEach( (fila,i) =>{
+          fila.forEach( (celda,j) =>{
+            if(!celda){
+              celdasVacias.push([i,j])
+            }
+          })
+        })
+        
+        if(turn && celdasVacias.length){
+          const [i,j] = celdasVacias[ parseInt( Math.random()*(celdasVacias.length-1) ) ]
+          // console.log(i,j)
+    
+          setTimeout(() => {
+            updateMatriz(i,j)
+          }, 400);
+    
+        }
     }
   }
 
