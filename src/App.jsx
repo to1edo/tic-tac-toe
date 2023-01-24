@@ -54,14 +54,13 @@ function App() {
     if(attempts.length){
       attempts.forEach((item,index,array)=>{
         if( item === 3){
-          setWinnerPos(array[--index].replace('X','').replace('O',''))
-          console.log(array[index].replace('X',''))
+          setWinnerPos(array[index-1].replace('X','').replace('O',''))
         }
       })
     }
   },[attempts])
 
-  const anyoneWon = (matriz)=>{
+  const anyoneWon = (matriz, simulator = false)=>{
     const count  = new Map()
 
     //diagonal 1
@@ -108,7 +107,10 @@ function App() {
 
       }
     }
-    setAttempts(Array.from(count).flat())
+
+    if(!simulator){
+      setAttempts(Array.from(count).flat())
+    }
     const result =  Array.from(count).flat().filter( item => typeof(item) === 'number').includes(3)
     return result
 
@@ -174,10 +176,9 @@ function App() {
           if(temporal[i][j] === ''){
             temporal[i] = [...temporal[i]]
             temporal[i][j] = 'O'
-            const result = anyoneWon(temporal)
+            const result = anyoneWon(temporal,true)
             if(result){
               attemptOne = 1
-              console.log('Win',[i,j],marca)
               
               setTimeout(() => {
                 updateMatriz(i,j)
@@ -211,10 +212,9 @@ function App() {
             if(temporal[i][j] === ''){
               temporal[i] = [...temporal[i]]
               temporal[i][j] = 'X'
-              const result = anyoneWon(temporal)
+              const result = anyoneWon(temporal,true)
               if(result){
                 attemptTwo = 1
-                console.log('Win',[i,j],'X')
                 
                 setTimeout(() => {
                   updateMatriz(i,j)
@@ -273,6 +273,8 @@ function App() {
             final={final}
             winnerPos={winnerPos}
             positions={positions}
+            marca={marca}      
+            gameMode={gameMode}      
             setTurn={setTurn}
           />
 
